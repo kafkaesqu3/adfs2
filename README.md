@@ -27,7 +27,7 @@ First create the AD domain controller
 vagrant up dc
 ```
 
-After that the domain `windomain.local` is up and running at IP address `192.168.38.2`.
+After that the domain `windomain.local` is up and running at IP address `192.168.131.2`.
 Some users will be created from the `users.csv` file.
 A special service user will be created for JBoss7 integration and its keytab file for SSO.
 

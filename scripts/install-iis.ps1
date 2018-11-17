@@ -44,35 +44,3 @@ $Command = "icacls $InetPubWWWRoot /grant BUILTIN\IIS_IUSRS:(OI)(CI)(RX) BUILTIN
 cmd.exe /c $Command
 $Command = "icacls $InetPubLog /grant ""NT SERVICE\TrustedInstaller"":(OI)(CI)(F)"
 cmd.exe /c $Command
-
-# --------------------------------------------------------------------
-# Setting IIS Variables
-# --------------------------------------------------------------------
-#Changing Log Location
-$Command = "%windir%\system32\inetsrv\appcmd set config -section:system.applicationHost/sites -siteDefaults.logfile.directory:$InetPubLog"
-cmd.exe /c $Command
-$Command = "%windir%\system32\inetsrv\appcmd set config -section:system.applicationHost/log -centralBinaryLogFile.directory:$InetPubLog"
-cmd.exe /c $Command
-$Command = "%windir%\system32\inetsrv\appcmd set config -section:system.applicationHost/log -centralW3CLogFile.directory:$InetPubLog"
-cmd.exe /c $Command
-
-#Changing the Default Website location
-Set-ItemProperty 'IIS:\Sites\Default Web Site' -name physicalPath -value $InetPubWWWRoot
-
-# --------------------------------------------------------------------
-# Checking to prevent common errors
-# --------------------------------------------------------------------
-If (!(Test-Path "C:\inetpub\temp\apppools")) {
-  New-Item -Path "C:\inetpub\temp\apppools" -type directory -Force -ErrorAction SilentlyContinue
-}
-
-# --------------------------------------------------------------------
-# Deleting Old WWWRoot
-# --------------------------------------------------------------------
-# Remove-Item $InetPubOldLocation -Recurse -Force
-
-# --------------------------------------------------------------------
-# Resetting IIS
-# --------------------------------------------------------------------
-$Command = "IISRESET"
-Invoke-Expression -Command $Command

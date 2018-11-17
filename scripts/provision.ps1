@@ -6,7 +6,7 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
   Write-Host 'Hostname is still the original one, skip provisioning for reboot'
 
   Write-Host 'Install bginfo'
-  . c:\vagrant\scripts\install-bginfo.ps1
+  . c:\scripts\install-bginfo.ps1
 
   Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
 
@@ -16,13 +16,13 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'
-    . c:\vagrant\scripts\install-bginfo.ps1
+    . c:\scripts\install-bginfo.ps1
   }
 
   if ($env:COMPUTERNAME -imatch 'dc') {
-    . c:\vagrant\scripts\create-domain.ps1 192.168.38.2
+    . c:\scripts\create-domain.ps1 192.168.131.2
   } else {
-    . c:\vagrant\scripts\join-domain.ps1
+    . c:\scripts\join-domain.ps1
   }
 
   Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
@@ -33,11 +33,11 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'
-    . c:\vagrant\scripts\install-bginfo.ps1
+    . c:\scripts\install-bginfo.ps1
   }
 
   Write-Host 'Provisioning after joining domain'
 
-  $script = "c:\vagrant\scripts\provision-" + $box + ".ps1"
+  $script = "c:\scripts\provision-" + $box + ".ps1"
   . $script
 }
