@@ -22,11 +22,11 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    cfg.vm.network :private_network, ip: "192.168.131.2", gateway: "192.168.131.1"
+    cfg.vm.network :private_network, ip: "192.168.40.2", gateway: "192.168.40.1"
 
     cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.131.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -73,9 +73,10 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    cfg.vm.network :private_network, ip: "192.168.131.3", gateway: "192.168.131.1", dns: "192.168.131.2"
+    cfg.vm.network :private_network, ip: "192.168.40.3", gateway: "192.168.40.1", dns: "192.168.40.2"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.3 -dns 192.168.131.2"
+    cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.3 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -115,9 +116,10 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 80, host: 8080, id: "http", auto_correct: true
-    cfg.vm.network :private_network, ip: "192.168.131.4", gateway: "192.168.131.1", dns: "192.168.131.2"
+    cfg.vm.network :private_network, ip: "192.168.40.4", gateway: "192.168.40.1", dns: "192.168.40.2"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.4 -dns 192.168.131.2"
+    cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.4 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/increase-tcp-num-connections.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-chocolatey.ps1", privileged: false
@@ -156,9 +158,9 @@ config.vm.define "ps", autostart: false do |cfg|
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    cfg.vm.network :private_network, ip: "192.168.131.9", gateway: "192.168.131.1"
+    cfg.vm.network :private_network, ip: "192.168.40.9", gateway: "192.168.40.1"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.9 -dns 192.168.131.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.9 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -181,9 +183,9 @@ end
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    cfg.vm.network :private_network, ip: "192.168.131.15", gateway: "192.168.131.1"
+    cfg.vm.network :private_network, ip: "192.168.40.15", gateway: "192.168.40.1"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.131.15 -dns 192.168.131.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.15 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false

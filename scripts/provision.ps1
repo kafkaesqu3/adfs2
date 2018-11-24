@@ -14,13 +14,13 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   Write-Host -fore red "Ooops, workgroup!"
 
-  if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
+  if (!(Test-Path 'c:\scripts\bginfo.exe')) {
     Write-Host 'Install bginfo'
     . c:\scripts\install-bginfo.ps1
   }
 
   if ($env:COMPUTERNAME -imatch 'dc') {
-    . c:\scripts\create-domain.ps1 192.168.131.2
+    . c:\scripts\create-domain.ps1 192.168.40.2
   } else {
     . c:\scripts\join-domain.ps1
   }
@@ -31,7 +31,7 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   Write-Host -fore green "I am domain joined!"
 
-  if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
+  if (!(Test-Path 'c:\scripts\bginfo.exe')) {
     Write-Host 'Install bginfo'
     . c:\scripts\install-bginfo.ps1
   }

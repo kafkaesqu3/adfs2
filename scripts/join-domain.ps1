@@ -3,8 +3,8 @@ Write-Host 'Join the domain'
 Start-Sleep -m 2000
 
 Write-Host "First, set DNS to DC to join the domain"
-$newDNSServers = "192.168.131.2"
-$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.131."}
+$newDNSServers = "192.168.40.2"
+$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.40."}
 $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
 
 Start-Sleep -m 2000

@@ -1,8 +1,8 @@
 Import-Module ActiveDirectory
   
 try {
-  echo "no"
-  #NEW-ADOrganizationalUnit -name "IT-Services"
+  #echo "no"
+  NEW-ADOrganizationalUnit -name "IT-Services"
 } Catch {
   Write-Host "IT-Services"
   echo $_.Exception|format-list -force
@@ -10,8 +10,8 @@ try {
 
 
 Try {
-  echo "no"
-  #NEW-ADOrganizationalUnit -name "ServiceAccounts" -path "OU=IT-Services,DC=zioptis,DC=local"
+  #echo "no"
+  NEW-ADOrganizationalUnit -name "ServiceAccounts" -path "OU=IT-Services,DC=zioptis,DC=local"
 } Catch {
   Write-Host "ServiceAccounts"
   echo $_.Exception|format-list -force
