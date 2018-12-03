@@ -151,7 +151,7 @@ Vagrant.configure("2") do |config|
 
 
 config.vm.define "ps", autostart: false do |cfg|
-    cfg.vm.box = "detectionlab/windows_10_virtualbox"
+    cfg.vm.box = "detectionlab/windows_2016_virtualbox"
     cfg.vm.hostname = "ps"
 
     cfg.vm.communicator = "winrm"
@@ -160,6 +160,7 @@ config.vm.define "ps", autostart: false do |cfg|
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
     cfg.vm.network :private_network, ip: "192.168.40.9", gateway: "192.168.40.1"
 
+    cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.9 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
@@ -176,7 +177,7 @@ config.vm.define "ps", autostart: false do |cfg|
 end
 
   config.vm.define "ts", autostart: false do |cfg|
-    cfg.vm.box = 'detectionlab/windows_10_virtualbox'
+    cfg.vm.box = 'detectionlab/windows_2016_virtualbox'
     cfg.vm.hostname = "ts"
 
     cfg.vm.communicator = "winrm"
@@ -185,6 +186,7 @@ end
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
     cfg.vm.network :private_network, ip: "192.168.40.15", gateway: "192.168.40.1"
 
+    cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.15 -dns 192.168.40.2"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"

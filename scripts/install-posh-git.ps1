@@ -2,7 +2,7 @@
 #Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 #Install-Module posh-git -Scope CurrentUser
 
-cd Documents
+cd C:\users\vagrant\Documents
 git clone https://github.com/dahlbyk/posh-git
 cd posh-git
 . .\install.ps1
