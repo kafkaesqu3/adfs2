@@ -1,43 +1,33 @@
 Import-Module ActiveDirectory
   
-try {
-  #echo "no"
-  NEW-ADOrganizationalUnit -name "IT-Services"
-} Catch {
-  Write-Host "IT-Services"
-  echo $_.Exception|format-list -force
-}
+$Domain = Get-ADDomain
+$DomanDNS = $Domain.dnsroot
+$DomainShort = $Domain.name + '\'
 
+$identity = "svcJBOSS"
+$hostname = "jboss-dev"
+$password = 'Pa$sw0rd'
 
-Try {
-  #echo "no"
-  NEW-ADOrganizationalUnit -name "ServiceAccounts" -path "OU=IT-Services,DC=zioptis,DC=local"
-} Catch {
-  Write-Host "ServiceAccounts"
-  echo $_.Exception|format-list -force
-}
-
-$identity = "jb7nd"
-$hostname = "ND"
-$password = 'MyPa$sw0rd'
-
+# remove user if already created
 Try {
   Remove-ADUser -Identity $identity -Confirm:$false
 } Catch {
-  write-host "Remove-ADUser"
+  write-host "Error removing user that already existed"
   echo $_.Exception|format-list -force
 }
 
+# create account
 Try {
 New-ADUser -SamAccountName $identity -GivenName "JBoss7 SSO" -Surname "JBoss7 SSO" -Name $identity `
   -CannotChangePassword $true -PasswordNeverExpires $true -Enabled $true `
-  -Path "OU=ServiceAccounts,OU=IT-Services,DC=zioptis,DC=local" `
+  -Path $("OU=ServiceAccounts,OU=IT-Services," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName) `
   -AccountPassword (ConvertTo-SecureString -AsPlainText $password -Force)
 } Catch {
-  Write-host "New-ADUser "
+  Write-host "Error creating service account user"
   echo $_.Exception|format-list -force
 }
 
+# disable kerberos preauth on account (ASREP)
 # http://www.jeffgeiger.com/wiki/index.php/PowerShell/ADUnixImport
 try {
 Get-ADUser -Identity $identity | Set-ADAccountControl -DoesNotRequirePreAuth:$true
@@ -47,32 +37,27 @@ Get-ADUser -Identity $identity | Set-ADAccountControl -DoesNotRequirePreAuth:$tr
 }
 
 # create keytab
-echo "got it"
 New-Item -Path c:\vagrant\resources -type directory -Force -ErrorAction SilentlyContinue
 If (Test-Path c:\vagrant\resources\$identity.keytab) {
   Remove-Item c:\vagrant\resources\$identity.keytab
 }
-Try {
-  $servicePrincipalName = 'HTTP/' + $hostname + '.zioptis.local@zioptis.local'
-} catch {
-  write-host "servicePrincipalName"
-  echo $_.Exception|format-list -force
-}
+
+$servicePrincipalName = 'HTTP/' + $hostname + '.' + $DomainDNS + '@' + $DomainDNS
 
 Try {
-& ktpass -out c:\vagrant\resources\$identity.keytab -princ $servicePrincipalName -mapUser "zioptis\$identity" -mapOp set -pass $password  -crypto RC4-HMAC-NT
+& ktpass -out c:\vagrant\resources\$identity.keytab -princ $servicePrincipalName -mapUser $($DomainShort + "$identity") -mapOp set -pass $password  -crypto RC4-HMAC-NT
 }
 catch {
-  write-host "ktpass"
+  write-host "ktpass failed"
   echo $_.Exception|format-list -force
 }
 
 If (Test-Path c:\vagrant\resources\$identity.keytab) {
   try {
-    write-host "we made it to setspn"
     Write-Host -fore green "Keytab created for user $identity at c:\vagrant\resources\$identity.keytab"
     & setspn -l $identity
   } catch {
+    write-host "error setting SPN"
     echo $_.Exception|format-list -force
   }
 } else {

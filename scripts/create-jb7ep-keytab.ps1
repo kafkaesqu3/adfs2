@@ -1,12 +1,4 @@
 Import-Module ActiveDirectory
-Try {
-  NEW-ADOrganizationalUnit -name "IT-Services"
-} Catch {
-  echo $_.Exception|format-list -force
-}
-Try {
-  NEW-ADOrganizationalUnit -name "ServiceAccounts" -path "OU=IT-Services,DC=zioptis,DC=local"
-} Catch {echo $_.Exception|format-list -force}
 
 $identity = "jb7ep"
 $hostname = "EP"
