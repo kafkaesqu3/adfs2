@@ -46,17 +46,17 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
     end
 
-    # cfg.vm.provider "vmware_esxi" do |esxi|
-    #   esxi.esxi_hostname = '192.168.1.8'
-    #   esxi.esxi_username = 'root'
-    #   esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
-    #   esxi.esxi_hostport = 22
-    #   esxi.esxi_disk_store = 'datastore1'
-    #   esxi.esxi_resource_pool = '/VAGRANT'
-    #   esxi.guest_memsize = '2048'
-    #   esxi.guest_numvcpus  = '1'
-    #   esxi.esxi_virtual_network = ['TESTLAB']
-    # end
+    cfg.vm.provider "vmware_esxi" do |esxi|
+      esxi.esxi_hostname = '192.168.1.8'
+      esxi.esxi_username = 'root'
+      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_hostport = 22
+      esxi.esxi_disk_store = 'datastore1'
+      esxi.esxi_resource_pool = '/VAGRANT'
+      esxi.guest_memsize = '2048'
+      esxi.guest_numvcpus  = '1'
+      esxi.esxi_virtual_network = ['TESTLAB']
+    end
 
 
   end
@@ -179,6 +179,47 @@ end
   config.vm.define "ts", autostart: false do |cfg|
     cfg.vm.box = 'detectionlab/windows_2016_virtualbox'
     cfg.vm.hostname = "ts"
+
+    cfg.vm.communicator = "winrm"
+    cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+    cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
+    cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
+    cfg.vm.network :private_network, ip: "192.168.40.15", gateway: "192.168.40.1"
+
+    cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.15 -dns 192.168.40.2"
+    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+    cfg.vm.provision "reload"
+    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+    cfg.vm.provision "reload"
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--memory", 768]
+      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+
+    cfg.vm.provider "vmware_esxi" do |esxi|
+      esxi.esxi_hostname = '192.168.1.8'
+      esxi.esxi_username = 'root'
+      esxi.esxi_password = 'file:C:\Users\david\Desktop\keys\vagrant.txt'
+      esxi.esxi_hostport = 22
+      esxi.esxi_disk_store = 'datastore1'
+      esxi.esxi_resource_pool = '/VAGRANT'
+      esxi.guest_memsize = '2048'
+      esxi.guest_numvcpus  = '1'
+      esxi.esxi_virtual_network = ['TESTLAB']
+    end
+    
+  end
+
+
+  config.vm.define "workstation", autostart: false do |cfg|
+    cfg.vm.box = 'detectionlab/windows_10_virtualbox'
+    cfg.vm.hostname = "workstation"
 
     cfg.vm.communicator = "winrm"
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
