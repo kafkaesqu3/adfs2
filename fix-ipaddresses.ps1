@@ -1,5 +1,6 @@
-$configFiles = Get-ChildItem . *.* -rec | where { $_.GetType().Name -eq "FileInfo" }
-
+$configFiles = Get-ChildItem scripts/* *.* -rec | where { $_.GetType().Name -eq "FileInfo" }
+$configFiles += Get-ChildItem Vagrantfile
+ 
 foreach ($file in $configFiles)
 {
     if ($file.Name -eq 'fix-ipaddresses.ps1' -or $file.Name -like "*.box" -or $file.Name -like "*.tgz" -or $file.Name -like ".git*") {

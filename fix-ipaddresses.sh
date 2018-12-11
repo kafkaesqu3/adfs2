@@ -1,0 +1,1 @@
+find scripts -type f | xargs -0 sed -i '' -e 's/192\.168\.38/192.168.131/g'
