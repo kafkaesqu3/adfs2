@@ -1,7 +1,6 @@
 Import-Module ActiveDirectory
   
 $Domain = Get-ADDomain
-$DomanDNS = $Domain.dnsroot
 $DomainShort = $Domain.name + '\'
 
 $identity = "svcJBOSS"
@@ -12,7 +11,7 @@ $password = 'Pa$sw0rd'
 Try {
   Remove-ADUser -Identity $identity -Confirm:$false
 } Catch {
-  write-host "Error removing user that already existed"
+  write-host "Error removing user; account probably doesnt exist"
   echo $_.Exception|format-list -force
 }
 
@@ -20,7 +19,7 @@ Try {
 Try {
 New-ADUser -SamAccountName $identity -GivenName "JBoss7 SSO" -Surname "JBoss7 SSO" -Name $identity `
   -CannotChangePassword $true -PasswordNeverExpires $true -Enabled $true `
-  -Path $("OU=ServiceAccounts,OU=IT-Services," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName) `
+  -Path $("OU=ServiceAccounts,OU=IT-Services," + $Domain.DistinguishedName) `
   -AccountPassword (ConvertTo-SecureString -AsPlainText $password -Force)
 } Catch {
   Write-host "Error creating service account user"
@@ -42,7 +41,7 @@ If (Test-Path c:\vagrant\resources\$identity.keytab) {
   Remove-Item c:\vagrant\resources\$identity.keytab
 }
 
-$servicePrincipalName = 'HTTP/' + $hostname + '.' + $DomainDNS + '@' + $DomainDNS
+$servicePrincipalName = 'HTTP/' + $hostname + '.' + $Domain.dnsroot + '@' + $Domain.dnsroot.ToUpper()
 
 Try {
 & ktpass -out c:\vagrant\resources\$identity.keytab -princ $servicePrincipalName -mapUser $($DomainShort + "$identity") -mapOp set -pass $password  -crypto RC4-HMAC-NT
