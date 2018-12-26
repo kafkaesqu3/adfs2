@@ -30,6 +30,31 @@ $EmployeeRoles = @(
   "Operations"
     )
 
+$Geographic = @(
+  "US")
+
+$Locations = @( #location of asset
+  "C3",
+  "C5",
+  "HQ")
+$purpose = @(
+  "DC", #DOMAIN CONTROLLERS
+  "APP", #application server
+  "SQL",
+  "DB", #
+  "FS", #FILE
+  "PS", #PRINT
+  "EXCH", #EXCHANGE
+  "CTX", # CITRIX
+  "ESX", # VMWARE
+$Environments = @(
+  "DEV",
+  "QA",
+  "PROD",)
+$Virtual = @(
+  "V" # virtual
+  "P") #physical
+
 Function Test-OUPath()
 {
     param([string]$path)
@@ -240,11 +265,33 @@ function populate-groups
 
 function create-machineaccounts {
   Write-Output "Creating machine accounts for servers to ensure they are placed in the correct OU"
-  $ServerOUPath = "OU=" + $dept + ",OU=Servers,OU=$RegionalOU," + $Domain.DistinguishedName
+  $ServerOUPath = "OU=Servers,OU=$RegionalOU," + $Domain.DistinguishedName
   New-ADComputer -Name "adfs2" -SamAccountName "adfs2" -Path $ServerOUPath
   New-ADComputer -Name "web" -SamAccountName "web" -Path $ServerOUPath
   New-ADComputer -Name "ps" -SamAccountName "ps" -Path $ServerOUPath
   New-ADComputer -Name "ts" -SamAccountName "ts" -Path $ServerOUPath
+
+  Write-Output "Creating 1000 additional machine accounts to make domain look real"
+  $InputRange = 10000..99999
+  $RandomRange = $InputRange | Where-Object { $Exclude -notcontains $_ }
+
+  for ($i=1; $i -le 1000; $i++)
+  {
+    # randomly get each part of the hostname
+    $geo_hostname = Get-Random -InputObject $Geographic -Count 1
+    $loc_hostname = Get-Random -InputObject $Locations -Count 1
+    $pur_hostname = Get-Random -InputObject $purpose -Count 1
+    $env_hostname = Get-Random -InputObject $Environments -Count 1
+    $vir_hostname = Get-Random -InputObject $Virtual -Count 1
+
+    $rand = Get-Random -InputObject $RandomRange
+
+    # build hostname
+    # example: USC5-APPDEVV-33522
+    $hostname = "$($geo_hostname)$($loc_hostname)-$($pur_hostname)$($env_hostname)$($vir_hostname)$($rand)"
+    New-ADComputer -Name $hostname -SamAccountName $hostname -Path $ServerOUPath
+  }
+
 }
 
 Create-RegionalOU
