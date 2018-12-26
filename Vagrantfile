@@ -238,6 +238,7 @@ end
 
     cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
     cfg.vm.provision "file", source: "tools/", destination: "C:\\tools"
+    cfg.vm.provision "file", source: "resources/", destination: "C:\\resources"
 
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.40.6 -dns 192.168.40.2"

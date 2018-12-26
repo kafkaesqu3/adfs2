@@ -242,9 +242,9 @@ function create-machineaccounts {
   Write-Output "Creating machine accounts for servers to ensure they are placed in the correct OU"
   $ServerOUPath = "OU=" + $dept + ",OU=Servers,OU=$RegionalOU," + $Domain.DistinguishedName
   New-ADComputer -Name "adfs2" -SamAccountName "adfs2" -Path $ServerOUPath
-  New-ADComputer -Name "web" -SamAccountName "adfs2" -Path $ServerOUPath
-  New-ADComputer -Name "ps" -SamAccountName "adfs2" -Path $ServerOUPath
-  New-ADComputer -Name "ts" -SamAccountName "adfs2" -Path $ServerOUPath
+  New-ADComputer -Name "web" -SamAccountName "web" -Path $ServerOUPath
+  New-ADComputer -Name "ps" -SamAccountName "ps" -Path $ServerOUPath
+  New-ADComputer -Name "ts" -SamAccountName "ts" -Path $ServerOUPath
 }
 
 Create-RegionalOU

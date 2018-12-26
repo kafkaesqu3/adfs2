@@ -6,3 +6,4 @@ resources/
 *.ops
 *.log
 *.txt
+scripts/users2.csv
