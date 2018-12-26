@@ -37,6 +37,7 @@ $Locations = @( #location of asset
   "C3",
   "C5",
   "HQ")
+
 $purpose = @(
   "DC", #DOMAIN CONTROLLERS
   "APP", #application server
@@ -46,13 +47,15 @@ $purpose = @(
   "PS", #PRINT
   "EXCH", #EXCHANGE
   "CTX", # CITRIX
-  "ESX", # VMWARE
+  "ESX"  # VMWARE
+  )
 $Environments = @(
   "DEV",
   "QA",
-  "PROD",)
+  "PROD")
+
 $Virtual = @(
-  "V" # virtual
+  "V", # virtual
   "P") #physical
 
 Function Test-OUPath()

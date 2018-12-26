@@ -5,3 +5,5 @@ choco install -y nodejs.install
 choco install -y git
 choco install -y vim
 choco install -y VisualStudioExpress2013WindowsDesktop
+
+Write-Output "node is done! If this doesnt exit automatically, ^C^C^C a few times"

@@ -6,4 +6,4 @@ wusa.exe C:\resources\WindowsTH-RSAT_WS_1803-x64.msu /quiet /norestart
 . C:\scripts\disable-defender.ps1
 
 
-Write-Output "Workstation is done"
+Write-Output "Workstation is done! If this message doesnt go away, ^C^C^C a few times"

@@ -9,3 +9,4 @@ Write-Host "Installing ADFS 2"
 & 'C:\scripts\AdfsSetup.exe' '/quiet' '/norestart'
 
 Write-Host "Status of AdfsSetup = " $LASTEXITCODE
+Write-Output "adfs is done! If this doesnt exit automatically, ^C^C^C a few times"

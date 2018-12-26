@@ -12,7 +12,7 @@ function fill-department-share
 function fill-sysvol
 {
     new-item $env:systemroot\sysvol\scripts
-    Write-Output "Copying files into SYSVOL"
+    Write-Output "Copying scripts into SYSVOL"
     #copy-item C:\fileshare\sysvol\* $env:systemroot\sysvol\scripts
 }
 

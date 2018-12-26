@@ -9,3 +9,5 @@ Start-Service -Name 'wuauserv'
 . c:\scripts\install-posh-git.ps1
 . c:\scripts\insert-ssh-key.ps1
 #. c:\scripts\install-atom.ps1
+
+Write-Output "Web is done! If this message doesnt go away, ^C^C^C a few times"
