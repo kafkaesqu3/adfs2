@@ -25,6 +25,7 @@ New-ADUser -SamAccountName $identity -GivenName "JBoss7 SSO" -Surname "JBoss7 SS
   Write-host "Error creating service account user"
   echo $_.Exception|format-list -force
 }
+Add-ADGroupMember -Identity "ServiceAccounts" -Members $identity
 
 # disable kerberos preauth on account (ASREP)
 # http://www.jeffgeiger.com/wiki/index.php/PowerShell/ADUnixImport

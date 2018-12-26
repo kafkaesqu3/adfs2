@@ -36,6 +36,8 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
     . c:\scripts\install-bginfo.ps1
   }
 
+  c:\scripts\pinto10.exe /PTFILE C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell.exe
+
   Write-Host 'Provisioning after joining domain'
 
   $script = "c:\scripts\provision-" + $box + ".ps1"

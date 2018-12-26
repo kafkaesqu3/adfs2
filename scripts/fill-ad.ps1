@@ -142,6 +142,7 @@ function add-Groups
       New-ADGroup -Name "Server Admins" -SamAccountName ServerAdmins -GroupCategory Security -GroupScope Global -DisplayName "Server Administrators" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
       New-ADGroup -Name "Local Admins" -SamAccountName LocalAdmins -GroupCategory Security -GroupScope Global -DisplayName "Local Administrators" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
       New-ADGroup -Name "Helpdesk" -SamAccountName Helpdesk -GroupCategory Security -GroupScope Global -DisplayName "Helpdesk" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
+      New-ADGroup -Name "Service Accounts" -SamAccountName ServiceAccounts -GroupCategory Security -GroupScope Global -DisplayName "Service Accounts" -Path $("OU=IT-Services," + $Domain.DistinguishedName)
 
       foreach ($role in $EmployeeRoles) {
         New-ADGroup -Name $role -SamAccountName $role -GroupCategory Security -GroupScope Global -DisplayName $role
@@ -182,6 +183,39 @@ function add-Users
   }
 }
 
+function add-WorkshopUsers 
+{
+  Write-Output "Adding workshop users to domain"
+  if (!(Test-Path 'c:\scripts\users2.csv')) 
+  {
+    Write-Output "Data file users2.csv missing! Skipping this"  
+  } else {
+    Import-CSV -delimiter "," c:\scripts\users2.csv | foreach {
+      $user = $_
+      try {
+         New-ADUser -SamAccountName $user.SamAccountName -GivenName $user.First -Surname $user.Last -Name $user.Full `
+                   -Path $("OU=" + $user.Role + ",OU=Employees,OU=" + $RegionalOU + "," + $Domain.DistinguishedName) `
+                   -AccountPassword (ConvertTo-SecureString -AsPlainText $user.Password -Force) -Enabled $true
+      } catch {    
+        #Write-Output "WARNING: User $($user.SamAccountName) already in domain"
+      }
+      try {
+        Add-ADGroupMember -Identity $($user.Role) -Members $($user.SamAccountName)
+      } catch {
+        #Write-Output "Error adding user to group"
+      }
+      if ($_.Role -eq "Operations") {
+        $rand = get-random -Maximum 2
+        if ($rand -eq 0) {
+          Add-ADGroupMember -Identity CostCenter-125 -Members $_.SamAccountName
+        }
+        else {
+          Add-ADGroupMember -Identity CostCenter-123 -Members $_.SamAccountName
+        } 
+      }
+    }
+  }
+}
 
 function populate-groups 
 {
@@ -191,7 +225,12 @@ function populate-groups
                  -AccountPassword (ConvertTo-SecureString -AsPlainText "Zioptis123" -Force) -Enabled $true
   Add-ADGroupMember -Identity "Domain Admins" -Members "GOD"
 
-  
+
+  New-ADUser -SamAccountName "svcSAM505" -Name "Software Asset Nanagement" `
+                 -Path $("OU=IT-Services," + $Domain.DistinguishedName) `
+                 -AccountPassword (ConvertTo-SecureString -AsPlainText "nejif8envknc0hv" -Force) -Enabled $true
+  Add-ADGroupMember -Identity "Domain Admins" -Members "svcSAM505"
+
   try 
     {
         Add-ADGroupMember -Identity SecurePrinting -Members CostCenter-125
@@ -199,9 +238,20 @@ function populate-groups
     }
 }
 
+function create-machineaccounts {
+  Write-Output "Creating machine accounts for servers to ensure they are placed in the correct OU"
+  $ServerOUPath = "OU=" + $dept + ",OU=Servers,OU=$RegionalOU," + $Domain.DistinguishedName
+  New-ADComputer -Name "adfs2" -SamAccountName "adfs2" -Path $ServerOUPath
+  New-ADComputer -Name "web" -SamAccountName "adfs2" -Path $ServerOUPath
+  New-ADComputer -Name "ps" -SamAccountName "adfs2" -Path $ServerOUPath
+  New-ADComputer -Name "ts" -SamAccountName "adfs2" -Path $ServerOUPath
+}
+
 Create-RegionalOU
 Fill-RegionalOUs
 Create-ITServicesOUs
 Add-Groups
 Add-Users
+add-WorkshopUsers
 populate-groups
+create-machineaccounts
