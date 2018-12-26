@@ -58,6 +58,41 @@ $Virtual = @(
   "V", # virtual
   "P") #physical
 
+$SecurityGroups = @(
+  "EmailUsers",
+  "VPNUsers",
+  "CitrixUsers",
+  "ExchMailboxAdm",
+  "RDPaccess",
+  "SQLread0",
+  "SQLread1",
+  "SQLread2",
+  "SQLread3",
+  "SQLwrite0",
+  "SQLwrite1",
+  "SQLwrite2",
+  "SQLwrite3",
+  "SQLwrite4",
+  "GitReadAccess",
+  "GitWriteAccess",
+  "FinanceAuditors",
+  "DBAudit",
+  "LegalRead",
+  "LegalWrite"
+  "HRread",
+  "HRwrite",
+  "Interns",
+  "TempEmployees",
+  "SalesforceRead",
+  "SalesforceWrite",
+  "ESXIread",
+  "ESXIwrite",
+  "ProdPush",
+  "DevPush",
+  "QApush",
+  "QAtest"
+  )
+
 Function Test-OUPath()
 {
     param([string]$path)
@@ -92,23 +127,37 @@ function Fill-RegionalOUs
 {
   foreach ($SubOU in $RegionalOUs)
   {
-      $OUPath = "OU=$SubOU,OU=$RegionalOU," + $Domain.DistinguishedName
-      
-      if (!(Test-OUPath $OUPath))
-      {
-          Write-Output "Creating OU: $SubOU"
-          New-ADOrganizationalUnit -Name $SubOU -Path $("OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
-      }
-      else
-      {
-          Write-Output "OU $SubOU already exists"
-      }
+    $OUPath = "OU=$SubOU,OU=$RegionalOU," + $Domain.DistinguishedName
+    
+    if (!(Test-OUPath $OUPath))
+    {
+        Write-Output "Creating OU: $SubOU"
+        New-ADOrganizationalUnit -Name $SubOU -Path $("OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
+    } else {
+        Write-Output "OU $SubOU already exists"
+    }
+  }
+
+  $OUPath = "OU=DeptGroups,OU=$RegionalOU," + $Domain.DistinguishedName
+  if (!(Test-OUPath $OUPath))
+  {
+      Write-Output "Creating OU: $OUPath"
+      New-ADOrganizationalUnit -Name "DeptGroups" -Path $("OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
+  } else {
+      Write-Output "OU $OUPath already exists"
+  }
+
+  $OUPath = "OU=AccessGroups,OU=$RegionalOU," + $Domain.DistinguishedName
+  if (!(Test-OUPath $OUPath))
+  {
+      Write-Output "Creating OU: $OUPath"
+      New-ADOrganizationalUnit -Name "AccessGroups" -Path $("OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
+  } else {
+      Write-Output "OU $OUPath already exists"
   }
 
 
   foreach ($dept in $EmployeeRoles) {
-
-
     $OUPath = "OU=" + $dept + ",OU=Employees,OU=$RegionalOU," + $Domain.DistinguishedName
     if (!(Test-OUPath $OUPath)) {
       Write-Output "Creating $dept OU"
@@ -116,14 +165,11 @@ function Fill-RegionalOUs
     } else {
       Write-Output "OU $dept already exists"
     }
-
   }
-
 }
 
 function Create-ITServicesOUs
 {
-
   $OUPath = "OU=IT-Services," + $Domain.DistinguishedName
   if (!(Test-OUPath $OUPath)) {
     Write-Output "Creating IT-Services OUs"
@@ -169,17 +215,26 @@ function add-Groups
 
       New-ADGroup -Name "Server Admins" -SamAccountName ServerAdmins -GroupCategory Security -GroupScope Global -DisplayName "Server Administrators" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
       New-ADGroup -Name "Local Admins" -SamAccountName LocalAdmins -GroupCategory Security -GroupScope Global -DisplayName "Local Administrators" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
-      New-ADGroup -Name "Helpdesk" -SamAccountName Helpdesk -GroupCategory Security -GroupScope Global -DisplayName "Helpdesk" -Path $("OU=SupportGroups,OU=IT-Services," + $Domain.DistinguishedName)
+      New-ADGroup -Name "ExchAdmins" -SamAccountName ExchAdmins -GroupCategory Security -GroupScope Global -DisplayName "Exchange Admins" -Path $("OU=IT-Services," + $Domain.DistinguishedName)
       New-ADGroup -Name "Service Accounts" -SamAccountName ServiceAccounts -GroupCategory Security -GroupScope Global -DisplayName "Service Accounts" -Path $("OU=IT-Services," + $Domain.DistinguishedName)
-
-      foreach ($role in $EmployeeRoles) {
-        New-ADGroup -Name $role -SamAccountName $role -GroupCategory Security -GroupScope Global -DisplayName $role
-      }
-    }
-  catch {
+  } catch {
     Write-Output "Error add-group"
   }
-      
+  foreach ($group in $EmployeeRoles) {
+    try {
+      New-ADGroup -Name $group -SamAccountName $group -GroupCategory Security -GroupScope Global -DisplayName $group -Path $("OU=DeptGroups," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
+      } catch {
+        Write-Output "Group $$group already exists"
+      }
+    }
+
+  foreach ($group in $SecurityGroups) {
+    try {
+      New-ADGroup -Name $group -SamAccountName $group -GroupCategory Security -GroupScope Global -DisplayName $group -Path $("OU=AccessGroups," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
+    } catch {
+      Write-Output "Group $$group already exists"
+    }
+  }
 }
 
 function add-Users 
@@ -202,12 +257,18 @@ function add-Users
     if ($_.Role -eq "Operations") {
       $rand = get-random -Maximum 2
       if ($rand -eq 0) {
-        Add-ADGroupMember -Identity CostCenter-125 -Members $_.SamAccountName
+        try {Add-ADGroupMember -Identity CostCenter-125 -Members $_.SamAccountName} catch {}
       }
       else {
-        Add-ADGroupMember -Identity CostCenter-123 -Members $_.SamAccountName
+        try {Add-ADGroupMember -Identity CostCenter-123 -Members $_.SamAccountName} catch {}
       } 
     }
+
+    $GroupMembership = Get-Random -InputObject $SecurityGroups -Count 7
+    foreach ($group in $GroupMembership) {
+      try {Add-ADGroupMember -Identity $group -Members $_.SamAccountName}
+      catch {}
+    }    
   }
 }
 
@@ -241,12 +302,18 @@ function add-WorkshopUsers
           Add-ADGroupMember -Identity CostCenter-123 -Members $_.SamAccountName
         } 
       }
+      $GroupMembership = Get-Random -InputObject $SecurityGroups -Count 7
+      foreach ($group in $GroupMembership) {
+        Add-ADGroupMember -Identity $group -Members $_.SamAccountName
+      }
     }
   }
 }
 
 function populate-groups 
 {
+  Add-ADGroupMember -Identity "Domain Admins" -Members "ExchAdmins"
+
   Write-Output "Creating DA account"
   New-ADUser -SamAccountName "GOD" -Name "GOD" `
                  -Path $("OU=IT-Services," + $Domain.DistinguishedName) `
@@ -256,8 +323,14 @@ function populate-groups
 
   New-ADUser -SamAccountName "svcSAM505" -Name "Software Asset Nanagement" `
                  -Path $("OU=IT-Services," + $Domain.DistinguishedName) `
-                 -AccountPassword (ConvertTo-SecureString -AsPlainText "nejif8envknc0hv" -Force) -Enabled $true
+                 -AccountPassword (ConvertTo-SecureString -AsPlainText "nejif8eVBEc0hv" -Force) -Enabled $true
   Add-ADGroupMember -Identity "Domain Admins" -Members "svcSAM505"
+
+
+  New-ADUser -SamAccountName "svcExch" -Name "Exchange Services" `
+                 -Path $("OU=IT-Services," + $Domain.DistinguishedName) `
+                 -AccountPassword (ConvertTo-SecureString -AsPlainText "ue3jfJfAi3fd3" -Force) -Enabled $true
+  Add-ADGroupMember -Identity "ExchAdmins" -Members "svcExch"
 
   try 
     {

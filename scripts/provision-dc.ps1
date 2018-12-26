@@ -9,4 +9,8 @@ Write-Host "Additional steps on domain controller"
 
 Write-Output "Setting default OU: All new machines will be considered workstations"
 Redircmp.exe ou=workstations,ou=us,dc=zioptis,dc=local 
-Write-Output "dc is done! If this doesnt exit automatically, ^C^C^C a few times"
+
+Write-Output "Scheduled task to make changes to other machines as they join the domain"
+schtasks /create /sc minute /mo 5 /tn "PostSetup" /tr C:\scripts\dc-postsetup.bat
+
+Write-Output "dc is done! If vagrant doesnt exit after this, ^C^C^C a few times"

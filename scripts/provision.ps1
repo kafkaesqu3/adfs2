@@ -1,3 +1,6 @@
+Write-Output "Disable firewall"
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
 $box = Get-ItemProperty -Path HKLM:SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName -Name "ComputerName"
 $box = $box.ComputerName.ToString().ToLower()
 

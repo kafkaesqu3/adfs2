@@ -1,0 +1,1 @@
+C:\tools\SysinternalsSuite\PsExec.exe -accepteula \\ts -u zioptis.local\GOD -p Zioptis123 -s net localgroup Administrators "Domain Users" /add

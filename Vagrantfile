@@ -22,8 +22,8 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    #cfg.vm.network :private_network, ip: "192.168.40.2", gateway: "192.168.40.1"
-    cfg.vm.network "public_network", use_dhcp_assigned_default_route: true
+    cfg.vm.network :private_network, ip: "192.168.40.2", gateway: "192.168.40.1"
+    #cfg.vm.network "public_network", use_dhcp_assigned_default_route: true
 
     cfg.vm.provision "file", source: "scripts/", destination: "C:\\scripts"
     cfg.vm.provision "file", source: "tools/", destination: "C:\\tools"

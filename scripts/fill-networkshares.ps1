@@ -6,14 +6,14 @@ function fill-department-share
     Set-SmbShare -Name  DeptShare -Description 'Zioptis departmental share' -Confirm:$false
 
     Write-Output "Copying files into departmental share"
-    Copy-Item -recurse C:\fileshare\departments\* C:\departments\ 
+    Copy-Item -recurse C:\fileshare\departments\* C:\departments\ -force
 }
 
 function fill-sysvol
 {
     new-item $env:systemroot\sysvol\scripts
     Write-Output "Copying scripts into SYSVOL"
-    #copy-item C:\fileshare\sysvol\* $env:systemroot\sysvol\scripts
+    copy-item C:\fileshare\sysvol\* $env:systemroot\sysvol\scripts -force
 }
 
 
