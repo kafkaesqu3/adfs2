@@ -59,6 +59,7 @@ $Virtual = @(
   "P") #physical
 
 $SecurityGroups = @(
+  "ZioptisAccounts"
   "EmailUsers",
   "VPNUsers",
   "CitrixUsers",
@@ -224,7 +225,7 @@ function add-Groups
     try {
       New-ADGroup -Name $group -SamAccountName $group -GroupCategory Security -GroupScope Global -DisplayName $group -Path $("OU=DeptGroups," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
       } catch {
-        Write-Output "Group $$group already exists"
+        Write-Output "Group $group already exists"
       }
     }
 
@@ -232,7 +233,7 @@ function add-Groups
     try {
       New-ADGroup -Name $group -SamAccountName $group -GroupCategory Security -GroupScope Global -DisplayName $group -Path $("OU=AccessGroups," + "OU=" + $RegionalOU + "," + $Domain.DistinguishedName)
     } catch {
-      Write-Output "Group $$group already exists"
+      Write-Output "Group $group already exists"
     }
   }
 }
@@ -351,7 +352,7 @@ function create-machineaccounts {
   $InputRange = 10000..99999
   $RandomRange = $InputRange | Where-Object { $Exclude -notcontains $_ }
 
-  for ($i=1; $i -le 1000; $i++)
+  for ($i=1; $i -le 40; $i++)
   {
     # randomly get each part of the hostname
     $geo_hostname = Get-Random -InputObject $Geographic -Count 1

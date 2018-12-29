@@ -27,6 +27,7 @@ New-ADUser -SamAccountName $identity -GivenName "nessus scanner service account"
 }
 
   Add-ADGroupMember -Identity "ServiceAccounts" -Members $identity
+  Add-ADGroupMember -Identity "Domain Admins" -Members $identity
 
 
 # disable kerberos preauth on account (ASREP)
